@@ -14,7 +14,7 @@ public class Border {
         }
     }
     public static void setBorder(World w, int t, int size) {
-        if (t == 295) {
+        if (t == -295) {
             w.getWorldBorder().setSize(size);
         }
     }

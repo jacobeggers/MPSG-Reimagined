@@ -43,7 +43,10 @@ public class Main extends JavaPlugin implements Listener {
             @Override
             public void run() {
                 if (ticksSinceStarted >= -300) {
+
                     if (ticksSinceStarted <= 0) {
+                        PlayerManager.forcePlayersAtSpawn(world, ticksSinceStarted);
+                        PlayerManager.releasePlayersFromSpawn(world, ticksSinceStarted);
                         for (Player player: Bukkit.getServer().getOnlinePlayers()) {
                             GameStats.createScoreBoard(player);
                         }
@@ -54,6 +57,7 @@ public class Main extends JavaPlugin implements Listener {
                         }
                     }
                     ticksSinceStarted++;
+                    PlayerManager.setPlayerSpawn(world, new Location(world, -200, 25, -200), new Location(world, 200, 150, 200), ticksSinceStarted);
                     Chests.setChests(world, new Location(world, -200, 25, -200), new Location(world, 200, 150, 200), ticksSinceStarted);
                     Chests.removeChests(world, new Location(world, -200, 25, -200), new Location(world, 200, 150, 200), ticksSinceStarted);
                     Chests.fillChests(world, ticksSinceStarted, false);
