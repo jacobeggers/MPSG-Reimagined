@@ -12,7 +12,7 @@ public class DMCommand implements CommandExecutor {
         GameStats.setDeathmatchTime(60);
         for (Player player: Bukkit.getServer().getOnlinePlayers()) {
             player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, 3, 1);
-            player.sendMessage("§a§l" + sender.getName() + "§a§lhas initiated deathmatch!");
+            player.sendMessage("§a§l" + sender.getName() + "§a§l has initiated deathmatch!");
         }
         return true;
     }

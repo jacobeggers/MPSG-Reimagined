@@ -19,15 +19,23 @@ public class Chests {
     private static ArrayList<Location> chests = new ArrayList<Location>();
 
     private static Material[] loot = {Material.STONE_SWORD, Material.STONE_AXE, Material.WOOD_SWORD, Material.WOOD_AXE,
-    Material.COOKED_BEEF, Material.COOKED_CHICKEN, Material.PORK, Material.COOKED_MUTTON, Material.APPLE, Material.FISHING_ROD, Material.BREAD,
-    Material.STICK, Material.IRON_INGOT, Material.GOLD_INGOT, Material.ARROW, Material.BOW, Material.GOLD_HELMET, Material.GOLD_CHESTPLATE,
-    Material.GOLD_LEGGINGS, Material.GOLD_BOOTS, Material.CHAINMAIL_HELMET, Material.CHAINMAIL_CHESTPLATE, Material.CHAINMAIL_LEGGINGS,
-    Material.CHAINMAIL_BOOTS, Material.LEATHER_HELMET, Material.LEATHER_CHESTPLATE, Material.LEATHER_LEGGINGS, Material.LEATHER_BOOTS};
+        Material.COOKED_BEEF, Material.COOKED_CHICKEN, Material.PORK, Material.COOKED_MUTTON, Material.APPLE, Material.FISHING_ROD, Material.BREAD,
+        Material.STICK, Material.IRON_INGOT, Material.GOLD_INGOT, Material.ARROW, Material.BOW, Material.GOLD_HELMET, Material.GOLD_CHESTPLATE,
+        Material.GOLD_LEGGINGS, Material.GOLD_BOOTS, Material.CHAINMAIL_HELMET, Material.CHAINMAIL_CHESTPLATE, Material.CHAINMAIL_LEGGINGS,
+        Material.CHAINMAIL_BOOTS, Material.LEATHER_HELMET, Material.LEATHER_CHESTPLATE, Material.LEATHER_LEGGINGS, Material.LEATHER_BOOTS};
+
+    private static Material[] midLoot = {Material.STONE_SWORD, Material.STONE_AXE, Material.WOOD_SWORD, Material.WOOD_AXE,
+            Material.COOKED_BEEF, Material.COOKED_CHICKEN, Material.PORK, Material.COOKED_MUTTON, Material.APPLE, Material.FISHING_ROD, Material.BREAD,
+            Material.STICK, Material.IRON_INGOT, Material.GOLD_INGOT, Material.ARROW, Material.BOW, Material.GOLD_HELMET, Material.GOLD_CHESTPLATE,
+            Material.GOLD_LEGGINGS, Material.GOLD_BOOTS, Material.CHAINMAIL_HELMET, Material.CHAINMAIL_CHESTPLATE, Material.CHAINMAIL_LEGGINGS,
+            Material.CHAINMAIL_BOOTS, Material.LEATHER_HELMET, Material.LEATHER_CHESTPLATE, Material.LEATHER_LEGGINGS, Material.LEATHER_BOOTS,
+            Material.IRON_HELMET, Material.IRON_CHESTPLATE, Material.IRON_LEGGINGS, Material.IRON_BOOTS, Material.DIAMOND};
 
     private static int numOfLoot[] = {1, 1, 1, 1, 3, 3, 3, 3, 3, 1, 3, 2, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    private static int numOfMidLoot[] = {1, 1, 1, 1, 3, 3, 3, 3, 3, 1, 3, 2, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
     public static void removeChests(World w, Location sl, Location el, int t) {
-        if (t == 1 && Main.day == 0) {
+        if (t == -299 && Main.day == 0) {
             for (double x = sl.getX(); x <= el.getX(); x++) {
                 for (double y = sl.getY(); y <= el.getY(); y++) {
                     for (double z = sl.getZ(); z <= el.getZ(); z++) {
@@ -46,7 +54,7 @@ public class Chests {
 
     }
     public static void setChests(World w, Location sl, Location el, int t) {
-        if (t == 2 && Main.day == 0) {
+        if (t == -298 && Main.day == 0) {
             for (double x = sl.getX(); x <= el.getX(); x++) {
                 for (double y = sl.getY(); y <= el.getY(); y++) {
                     for (double z = sl.getZ(); z <= el.getZ(); z++) {
@@ -60,6 +68,11 @@ public class Chests {
                                 w.getBlockAt((int)x, (int)y, (int)z).setType(Material.CHEST);
                                 chests.add(new Location(w, x, y, z));
                             }
+                        } else if (w.getBlockAt((int)x, (int)y, (int)z).getType() == Material.ENDER_PORTAL_FRAME) {
+                            if (r.nextBoolean() == true) {
+                                w.getBlockAt((int)x, (int)y + 2, (int)z).setType(Material.CHEST);
+                                chests.add(new Location(w, x, y + 2, z));
+                            }
                         }
                     }
                 }
@@ -68,8 +81,17 @@ public class Chests {
     }
 
     public static void fillChests(World w, int t, boolean refill) {
-        if ((t == 4 && Main.day == 0) || refill == true) {
+        if ((t == -296 && Main.day == 0) || refill == true) {
             for (int i = 0; i < chests.size(); i++) {
+                if (w.getBlockAt((int)chests.get(i).getX(), (int)chests.get(i).getY() - 2, (int)chests.get(i).getZ()).getType() == Material.ENDER_PORTAL_FRAME) {
+                    System.out.println("rgwaeg");
+                    Chest chest = (Chest) w.getBlockAt((int)chests.get(i).getX(), (int)chests.get(i).getY(), (int)chests.get(i).getZ()).getState();
+                    Inventory chestinv = chest.getBlockInventory();
+                    for (int j = 0; j < r.nextInt(3) + 2; j++) {
+                        int selector = r.nextInt(midLoot.length);
+                        chestinv.setItem(r.nextInt(27), new ItemStack(midLoot[selector], r.nextInt(numOfMidLoot[selector]) + 1));
+                    }
+                }
                 Chest chest = (Chest) w.getBlockAt((int)chests.get(i).getX(), (int)chests.get(i).getY(), (int)chests.get(i).getZ()).getState();
                 Inventory chestinv = chest.getBlockInventory();
                 for (int j = 0; j < r.nextInt(3) + 2; j++) {

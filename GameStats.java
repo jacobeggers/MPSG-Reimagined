@@ -25,7 +25,25 @@ public class GameStats implements Listener {
     private static Score[] scores = new Score[16];
     private static String[] values = {"§a§lTime", (int)time + " Seconds", "§e§lTributes", "" + playersAlive, "§6§lChest Refill", (double) round(((chestTime - 1) / 60) * 10) / 10 + " Minutes "};
     private static int[] pos = {14, 13, 11, 10, 8, 7};
+    private static int countDown = 15;
 
+    public static void gameCountdown(int t) {
+        if (t % 20 == 0 && countDown > 0) {
+            countDown--;
+            if (countDown <= 15 && countDown > 0) {
+                for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                    player.playSound(player.getLocation(), Sound.NOTE_STICKS, 3, 1);
+                    player.sendTitle("§e" + countDown, "Prepare to fight!");
+                }
+            }
+            if (countDown == 0) {
+                for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                    player.playSound(player.getLocation(), Sound.NOTE_STICKS, 3, 1.5f);
+                    player.sendTitle("§6FIGHT!", "The game has begun!");
+                }
+            }
+        }
+    }
     public static void createScoreBoard(Player player) {
         ScoreboardManager manager = Bukkit.getScoreboardManager();
         Scoreboard board = manager.getNewScoreboard();
@@ -40,7 +58,6 @@ public class GameStats implements Listener {
         int count = 0;
         for (int i = 15; i >= 7; i--) {
             if (i == pos[count]) {
-                System.out.println(pos.length);
                 scores[i] = objective.getScore(values[count]);
                 scores[i].setScore(i);
                 count++;
@@ -57,6 +74,7 @@ public class GameStats implements Listener {
 
     public static void updateGameTime(World w, int t) {
         if (t % 20 == 0) {
+            objective.getScoreboard().resetScores("0 Seconds");
             time++;
             if (time < 60) {
                 objective.getScoreboard().resetScores((int)(time - 1) + " Seconds");
@@ -74,14 +92,15 @@ public class GameStats implements Listener {
 
     public static void updateChestTime(World w, int t) {
         if (t % 20 == 0) {
+            objective.getScoreboard().resetScores("7.0 Minutes ");
             if (chestTime > 0) {
                 chestTime--;
             }
             if (chestTime < 60 && chestTime >= 0) {
                 objective.getScoreboard().resetScores((double) round(((chestTime + 1) / 60) * 10) / 10 + " Minutes ");
                 objective.getScoreboard().resetScores((int)(chestTime + 1) + " Seconds ");
-                scores[1] = objective.getScore((int)chestTime + " Seconds ");
-                scores[1].setScore(7);
+                scores[5] = objective.getScore((int)chestTime + " Seconds ");
+                scores[5].setScore(7);
             } else if (chestTime >= 0) {
                 objective.getScoreboard().resetScores((double) round(((chestTime + 1) / 60) * 10) / 10 + " Minutes ");
                 scores[5] = objective.getScore((double) round(((chestTime) / 60) * 10) / 10 + " Minutes ");
@@ -121,12 +140,12 @@ public class GameStats implements Listener {
                 if (deathmatchTime <= 60 && deathmatchTime >= 0) {
                     objective.getScoreboard().resetScores((double) round(((deathmatchTime + 1) / 60) * 10) / 10 + " Minutes ");
                     objective.getScoreboard().resetScores((int)(deathmatchTime + 1) + " Seconds ");
-                    scores[1] = objective.getScore((int)deathmatchTime + " Seconds ");
-                    scores[1].setScore(7);
+                    scores[6] = objective.getScore((int)deathmatchTime + " Seconds ");
+                    scores[6].setScore(7);
                 } else if (deathmatchTime >= 0) {
                     objective.getScoreboard().resetScores((double) round(((deathmatchTime + 1) / 60) * 10) / 10 + " Minutes ");
-                    scores[5] = objective.getScore((double) round(((deathmatchTime) / 60) * 10) / 10 + " Minutes ");
-                    scores[5].setScore(7);
+                    scores[6] = objective.getScore((double) round(((deathmatchTime) / 60) * 10) / 10 + " Minutes ");
+                    scores[6].setScore(7);
                 }
             }
             if (deathmatchTime == 60) {

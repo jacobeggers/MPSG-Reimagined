@@ -28,8 +28,8 @@ public class SupplyDrop {
     private static boolean dropping = false;
     private static int dropTime = 500;
 
-    public static void supplyDrop(World w, Location sl, Location el, int t) {
-        if (t == 3 && Main.day == 0) {
+    public static void setSupplyDrop(World w, Location sl, Location el, int t) {
+        if (t == -297 && Main.day == 0) {
             if (locX.size() > 0) {
                 for (int i = locX.size() - 1; i >= 0; i--) {
                     locX.remove(i);
@@ -52,6 +52,8 @@ public class SupplyDrop {
                 }
             }
         }
+    }
+    public static void updateSupplyDrop(World w, int t) {
         if (t == 3900) {
             select = r.nextInt(locX.size());
             fireWorkY = locY.get(select) + 150;

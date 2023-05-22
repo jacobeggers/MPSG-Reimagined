@@ -27,7 +27,7 @@ import java.util.EventListener;
 import java.util.List;
 
 public class Main extends JavaPlugin implements Listener {
-    public int ticksSinceStarted = 0;
+    public int ticksSinceStarted = -300;
     private double percent = 0.001;
     public static int day = 0;
 
@@ -38,24 +38,39 @@ public class Main extends JavaPlugin implements Listener {
     public void onEnable() {
         world.setTime(0);
         getServer().getPluginManager().registerEvents(this, this);
-        this.getCommand("deathmatch").setExecutor(new DMCommand());
+        this.getCommand("dm").setExecutor(new DMCommand());
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
-                ticksSinceStarted++;
-                // System.out.println(ticksSinceStarted);
+                if (ticksSinceStarted >= -300) {
+                    if (ticksSinceStarted <= 0) {
+                        for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                            GameStats.createScoreBoard(player);
+                        }
+                    }
+                    if (ticksSinceStarted == -300) {
+                        for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                            player.playSound(player.getLocation(), Sound.LEVEL_UP, 3, 1);
+                        }
+                    }
+                    ticksSinceStarted++;
+                    Chests.setChests(world, new Location(world, -200, 25, -200), new Location(world, 200, 150, 200), ticksSinceStarted);
+                    Chests.removeChests(world, new Location(world, -200, 25, -200), new Location(world, 200, 150, 200), ticksSinceStarted);
+                    Chests.fillChests(world, ticksSinceStarted, false);
+                    SupplyDrop.setSupplyDrop(world, new Location(world, -200, 25, -200), new Location(world, 200, 150, 200), ticksSinceStarted);
+                    GameStats.gameCountdown(ticksSinceStarted);
+                    Border.setBorder(world, ticksSinceStarted, 250);
+                }
+                if (ticksSinceStarted > 0) {
 
-                GameStats.updateGameTime(world, ticksSinceStarted);
-                GameStats.updateChestTime(world, ticksSinceStarted);
-                GameStats.updateDeathmatchTime(world, ticksSinceStarted);
-                Border.shrinkBorder(world, ticksSinceStarted);
-                adjustDayLightCycle(world, ticksSinceStarted);
-                Chests.setChests(world, new Location(world, -200, 25, -200), new Location(world, 200, 150, 200), ticksSinceStarted);
-                Chests.removeChests(world, new Location(world, -200, 25, -200), new Location(world, 200, 150, 200), ticksSinceStarted);
-                Chests.fillChests(world, ticksSinceStarted, false);
-                SupplyDrop.supplyDrop(world, new Location(world, -200, 25, -200), new Location(world, 200, 150, 200), ticksSinceStarted);
-
-                // w.playSound(new Location(w, 0, 80, 0), Sound.A, 5, 5);
+                    GameStats.updateGameTime(world, ticksSinceStarted);
+                    GameStats.updateChestTime(world, ticksSinceStarted);
+                    GameStats.updateDeathmatchTime(world, ticksSinceStarted);
+                    SupplyDrop.updateSupplyDrop(world, ticksSinceStarted);
+                    Border.shrinkBorder(world, ticksSinceStarted);
+                    Border.playBorderSound(world, ticksSinceStarted);
+                    adjustDayLightCycle(world, ticksSinceStarted);
+                }
 
                 if (ticksSinceStarted >= 5100) {
                     ticksSinceStarted = 0;
@@ -84,7 +99,6 @@ public class Main extends JavaPlugin implements Listener {
         }
         if (t > 3900) {
             if (t % 12 == 0) {
-                System.out.println("running");
                 w.setTime((int)(13500 + ((24050 - 13500) * percent)));
                 percent += 0.01;
             } else if (t % 2 == 0) {
