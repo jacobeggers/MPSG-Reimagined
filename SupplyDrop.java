@@ -57,7 +57,7 @@ public class SupplyDrop {
             fireWorkY = locY.get(select) + 150;
             for (Player player: Bukkit.getServer().getOnlinePlayers()) {
                 player.sendMessage("§e§lSupply Drop Incoming (§f§l" + (locX.get(select) + 1) + "§e§l,§f§l " + (locY.get(select) + 1) + "§e§l,§f§l " + (locZ.get(select) + 1) + "§e§l)");
-            w.playSound(player.getLocation(), Sound.NOTE_PLING, 5, 1);
+                w.playSound(player.getLocation(), Sound.NOTE_PLING, 5, 1);
             }
             w.getBlockAt(locX.get(select), locY.get(select), locZ.get(select)).setType(Material.BEACON);
         }

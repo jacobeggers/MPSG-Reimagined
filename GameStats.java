@@ -1,15 +1,13 @@
 package hungrygamespackage;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scoreboard.*;
 import org.bukkit.entity.Player;
+import org.bukkit.Sound;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +20,10 @@ public class GameStats implements Listener {
     private static Random r = new Random();
     private static double time = 0;
     private static int playersAlive = Bukkit.getServer().getOnlinePlayers().size();
-    private static double chestTime = 7;
+    private static double chestTime = 419;
+    private static double deathmatchTime = 599;
     private static Score[] scores = new Score[16];
-    private static String[] values = {"§a§lTime", (int)time + " Seconds", "§e§lTributes", "" + playersAlive, "§6§lChest Refill", chestTime + " Minutes "};
+    private static String[] values = {"§a§lTime", (int)time + " Seconds", "§e§lTributes", "" + playersAlive, "§6§lChest Refill", (double) round(((chestTime - 1) / 60) * 10) / 10 + " Minutes "};
     private static int[] pos = {14, 13, 11, 10, 8, 7};
 
     public static void createScoreBoard(Player player) {
@@ -57,58 +56,110 @@ public class GameStats implements Listener {
     }
 
     public static void updateGameTime(World w, int t) {
-        if (t % 20 == 0 && t < 1200 && Main.day == 0) {
-                objective.getScoreboard().resetScores((int) time + " Seconds");
-                time = t / 20;
-                scores[2] = objective.getScore((int) time + " Seconds");
-                scores[2].setScore(13);
-                objective.getScoreboard().resetScores(0 + " Seconds");
+        if (t % 20 == 0) {
+            time++;
+            if (time < 60) {
+                objective.getScoreboard().resetScores((int)(time - 1) + " Seconds");
+                scores[1] = objective.getScore((int)time + " Seconds");
+                scores[1].setScore(13);
+            } else {
+                objective.getScoreboard().resetScores((int)(time - 1) + " Seconds");
+                objective.getScoreboard().resetScores((double) round(((time - 1) / 60) * 10) / 10 + " Minutes");
+                scores[1] = objective.getScore((double)round(((time) / 60) * 10) / 10 + " Minutes");
+                scores[1].setScore(13);
+            }
 
-        } else if (t == 1200 && Main.day == 0) {
-            objective.getScoreboard().resetScores((int) time + " Seconds");
-            time = 1.0;
-            scores[2] = objective.getScore(time + " Minutes");
-            scores[2].setScore(13);
-        } else if (t % 120 == 0) {
-            objective.getScoreboard().resetScores(0 + " Seconds");
-            objective.getScoreboard().resetScores(time + " Minutes");
-            time += 0.1;
-            time = round(10 * time);
-            time /= 10;
-            scores[2] = objective.getScore(time + " Minutes");
-            scores[2].setScore(13);
         }
     }
 
     public static void updateChestTime(World w, int t) {
-        if (t == 2100 && Main.day == 1) {
-            objective.getScoreboard().resetScores(chestTime + " Minutes ");
-            chestTime = 60;
-        } else if ((t > 2100 && t < 3300 && Main.day == 1) || (t >= 600 && Main.day == 2)) {
-            if (t % 20 == 0) {
-                objective.getScoreboard().resetScores((int)chestTime + " Seconds ");
+        if (t % 20 == 0) {
+            if (chestTime > 0) {
                 chestTime--;
-                scores[2] = objective.getScore((int)chestTime + " Seconds ");
-                scores[2].setScore(7);
             }
-        } else if (t % 120 == 0) {
-            objective.getScoreboard().resetScores("1 Seconds ");
-            objective.getScoreboard().resetScores(chestTime + " Minutes ");
-            chestTime -= 0.1;
-            chestTime = round(10 * chestTime);
-            chestTime /= 10;
-            scores[2] = objective.getScore(chestTime + " Minutes ");
-            scores[2].setScore(7);
+            if (chestTime < 60 && chestTime >= 0) {
+                objective.getScoreboard().resetScores((double) round(((chestTime + 1) / 60) * 10) / 10 + " Minutes ");
+                objective.getScoreboard().resetScores((int)(chestTime + 1) + " Seconds ");
+                scores[1] = objective.getScore((int)chestTime + " Seconds ");
+                scores[1].setScore(7);
+            } else if (chestTime >= 0) {
+                objective.getScoreboard().resetScores((double) round(((chestTime + 1) / 60) * 10) / 10 + " Minutes ");
+                scores[5] = objective.getScore((double) round(((chestTime) / 60) * 10) / 10 + " Minutes ");
+                scores[5].setScore(7);
+            }
+
+            if (chestTime / 60 <= 5 && chestTime / 60 > 0 && chestTime % 60 == 0) {
+                for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                    player.sendMessage("§6§lThe chests will be refilled in " + (int)(chestTime / 60) + " minutes");
+                }
+            }
+        }
+        if (chestTime == 0) {
+            Chests.fillChests(w, t, true);
+            for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                player.playSound(player.getLocation(), Sound.IRONGOLEM_DEATH, 3, 0.5f);
+                player.sendMessage("§6§lThe chests have been refilled!");
+            }
+            chestTime = -1;
+        }
+        if (chestTime == -1) {
+            objective.getScoreboard().resetScores(scores[5].getEntry());
         }
     }
 
     public static void updateDeathmatchTime(World w, int t) {
-        if (t == 3300 && Main.day == 1) {
-            objective.getScoreboard().resetScores("1 Seconds ");
-            objective.getScoreboard().resetScores("§6§lChest Refill");
-            scores[2] = objective.getScore("§c§lDeathmatch");
-            scores[2].setScore(8);
-            chestTime = 2.5;
+        if (t % 20 == 0) {
+            if (deathmatchTime > 0) {
+                deathmatchTime--;
+            }
+            if (deathmatchTime <= 180) {
+
+                chestTime = -1;
+                objective.getScoreboard().resetScores("§6§lChest Refill");
+                scores[4] = objective.getScore("§c§lDeathmatch");
+                scores[4].setScore(8);
+                if (deathmatchTime <= 60 && deathmatchTime >= 0) {
+                    objective.getScoreboard().resetScores((double) round(((deathmatchTime + 1) / 60) * 10) / 10 + " Minutes ");
+                    objective.getScoreboard().resetScores((int)(deathmatchTime + 1) + " Seconds ");
+                    scores[1] = objective.getScore((int)deathmatchTime + " Seconds ");
+                    scores[1].setScore(7);
+                } else if (deathmatchTime >= 0) {
+                    objective.getScoreboard().resetScores((double) round(((deathmatchTime + 1) / 60) * 10) / 10 + " Minutes ");
+                    scores[5] = objective.getScore((double) round(((deathmatchTime) / 60) * 10) / 10 + " Minutes ");
+                    scores[5].setScore(7);
+                }
+            }
+            if (deathmatchTime == 60) {
+                for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                    player.sendMessage("§a§lDeathmatch starting in " + (int)deathmatchTime + " seconds...");
+                }
+            }
+            if (deathmatchTime == 30) {
+                for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                    w.playSound(player.getLocation(), Sound.NOTE_PLING, 5, 1);
+                    player.sendMessage("§a§lDeathmatch starting in " + (int)deathmatchTime + " seconds...");
+                }
+            }
+            if (deathmatchTime == 10) {
+                for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                    w.playSound(player.getLocation(), Sound.NOTE_PLING, 5, 1);
+                    player.sendMessage("§a§lDeathmatch starting in " + (int)deathmatchTime + " seconds...");
+                }
+            }
+            if (deathmatchTime <= 5 && deathmatchTime > 0) {
+                for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                    w.playSound(player.getLocation(), Sound.NOTE_PLING, 5, 1);
+                    player.sendMessage("§a§lDeathmatch starting in " + (int)deathmatchTime + " seconds...");
+                }
+            }
+            if (deathmatchTime == 0) {
+                objective.getScoreboard().resetScores((int)(deathmatchTime) + " Seconds ");
+                deathmatchTime = -1;
+            }
         }
+    }
+
+    public static void setDeathmatchTime(int time) {
+        deathmatchTime = time;
     }
 }

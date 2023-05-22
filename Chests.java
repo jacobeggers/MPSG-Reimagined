@@ -67,8 +67,8 @@ public class Chests {
         }
     }
 
-    public static void fillChests(World w, int t) {
-        if ((t == 4 && Main.day == 0) || (t == 3300 && Main.day == 1)) {
+    public static void fillChests(World w, int t, boolean refill) {
+        if ((t == 4 && Main.day == 0) || refill == true) {
             for (int i = 0; i < chests.size(); i++) {
                 Chest chest = (Chest) w.getBlockAt((int)chests.get(i).getX(), (int)chests.get(i).getY(), (int)chests.get(i).getZ()).getState();
                 Inventory chestinv = chest.getBlockInventory();

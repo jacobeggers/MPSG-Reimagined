@@ -38,6 +38,7 @@ public class Main extends JavaPlugin implements Listener {
     public void onEnable() {
         world.setTime(0);
         getServer().getPluginManager().registerEvents(this, this);
+        this.getCommand("deathmatch").setExecutor(new DMCommand());
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
@@ -51,7 +52,7 @@ public class Main extends JavaPlugin implements Listener {
                 adjustDayLightCycle(world, ticksSinceStarted);
                 Chests.setChests(world, new Location(world, -200, 25, -200), new Location(world, 200, 150, 200), ticksSinceStarted);
                 Chests.removeChests(world, new Location(world, -200, 25, -200), new Location(world, 200, 150, 200), ticksSinceStarted);
-                Chests.fillChests(world, ticksSinceStarted);
+                Chests.fillChests(world, ticksSinceStarted, false);
                 SupplyDrop.supplyDrop(world, new Location(world, -200, 25, -200), new Location(world, 200, 150, 200), ticksSinceStarted);
 
                 // w.playSound(new Location(w, 0, 80, 0), Sound.A, 5, 5);
