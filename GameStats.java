@@ -20,8 +20,10 @@ public class GameStats implements Listener {
     private static Random r = new Random();
     private static double time = 0;
     private static int playersAlive = Bukkit.getServer().getOnlinePlayers().size();
-    private static double chestTime = 419;
+    public static double chestTime = 419;
     private static double deathmatchTime = 599;
+    public static double deathmatchCountDown = -1;
+    public static double gameEndTime = -1;
     private static Score[] scores = new Score[16];
     private static String[] values = {"§a§lTime", (int)time + " Seconds", "§e§lTributes", "" + playersAlive, "§6§lChest Refill", (double) round(((chestTime - 1) / 60) * 10) / 10 + " Minutes "};
     private static int[] pos = {14, 13, 11, 10, 8, 7};
@@ -131,7 +133,7 @@ public class GameStats implements Listener {
             if (deathmatchTime > 0) {
                 deathmatchTime--;
             }
-            if (deathmatchTime <= 180) {
+            if (deathmatchTime <= 180 && deathmatchTime > -1) {
 
                 chestTime = -1;
                 objective.getScoreboard().resetScores("§6§lChest Refill");
@@ -174,10 +176,77 @@ public class GameStats implements Listener {
             if (deathmatchTime == 0) {
                 objective.getScoreboard().resetScores((int)(deathmatchTime) + " Seconds ");
                 deathmatchTime = -1;
+                setDeathMatchCountDown();
+            }
+        }
+    }
+    public static void setDeathMatchCountDown() {
+         if (chestTime == -1 && deathmatchTime == -1){
+            System.out.println("passed");
+            deathmatchCountDown = 11;
+
+        }
+    }
+
+    public static void updateDeathMatchCountDown(World w, int t) {
+        if (t % 20 == 0) {
+            Border.setBorder(w, t, 100);
+            if (deathmatchCountDown > 0) {
+                deathmatchCountDown--;
+                objective.getScoreboard().resetScores((int)(deathmatchCountDown + 1) + " Seconds ");
+                scores[7] = objective.getScore((int)deathmatchCountDown + " Seconds ");
+                scores[7].setScore(7);
+                for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                    player.sendMessage("§c§lDeathmatch in " + (int)deathmatchCountDown + "§c§l...");
+                    w.playSound(player.getLocation(), Sound.NOTE_PLING, 5, 1);
+                }
+            } else if (deathmatchCountDown == 0) {
+                for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                    player.sendMessage("§c§lDeathmatch has begun!");
+                    player.playSound(player.getLocation(), Sound.WITHER_DEATH, 1, 0.5f);
+                }
+                objective.getScoreboard().resetScores((int)(deathmatchCountDown) + " Seconds ");
+                deathmatchCountDown = -1;
+                setGameEnd();
             }
         }
     }
 
+    public static void setGameEnd() {
+        if (chestTime == -1 && deathmatchTime == -1 && deathmatchCountDown == -1) {
+            gameEndTime = 180;
+            objective.getScoreboard().resetScores("§c§lDeathmatch");
+            scores[4] = objective.getScore("§c§lGame End");
+            scores[4].setScore(8);
+        }
+    }
+    public static void updateGameEnd(int t) {
+        if (t % 20 == 0) {
+            if (gameEndTime > 0) {
+                gameEndTime--;
+                if (gameEndTime <= 60 && gameEndTime >= 0) {
+                    objective.getScoreboard().resetScores((double) round(((gameEndTime + 1) / 60) * 10) / 10 + " Minutes ");
+                    objective.getScoreboard().resetScores((int)(gameEndTime + 1) + " Seconds ");
+                    scores[6] = objective.getScore((int)gameEndTime + " Seconds ");
+                    scores[6].setScore(7);
+                } else if (gameEndTime >= 0) {
+                    objective.getScoreboard().resetScores((double) round(((gameEndTime + 1) / 60) * 10) / 10 + " Minutes ");
+                    scores[6] = objective.getScore((double) round(((gameEndTime) / 60) * 10) / 10 + " Minutes ");
+                    scores[6].setScore(7);
+                }
+            }
+            if (gameEndTime == 0) {
+                for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                    player.damage(2);
+                }
+                objective.getScoreboard().resetScores(scores[5].getEntry());
+                scores[5] = objective.getScore("§c§lGame End");
+                objective.getScoreboard().resetScores("Game Ending");
+                scores[6] = objective.getScore("Game Ending");
+                scores[6].setScore(7);
+            }
+        }
+    }
     public static void setDeathmatchTime(int time) {
         deathmatchTime = time;
     }

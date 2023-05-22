@@ -84,7 +84,6 @@ public class Chests {
         if ((t == -296 && Main.day == 0) || refill == true) {
             for (int i = 0; i < chests.size(); i++) {
                 if (w.getBlockAt((int)chests.get(i).getX(), (int)chests.get(i).getY() - 2, (int)chests.get(i).getZ()).getType() == Material.ENDER_PORTAL_FRAME) {
-                    System.out.println("rgwaeg");
                     Chest chest = (Chest) w.getBlockAt((int)chests.get(i).getX(), (int)chests.get(i).getY(), (int)chests.get(i).getZ()).getState();
                     Inventory chestinv = chest.getBlockInventory();
                     for (int j = 0; j < r.nextInt(3) + 2; j++) {

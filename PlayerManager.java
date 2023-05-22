@@ -36,30 +36,31 @@ public class PlayerManager {
         }
     }
     public static void forcePlayersAtSpawn(World w, int t) {
-        if (t == -293)
+        if (t == -293 || GameStats.deathmatchCountDown == 10) {
             for (int i = 0; i < players.size(); i++) {
                 players.get(i).teleport(new Location(w, podiumLocations.get(i).getX() + 0.5,
                         podiumLocations.get(i).getY(),
                         podiumLocations.get(i).getZ() + 0.5));
-                w.getBlockAt((int)podiumLocations.get(i).getX() + 1,
-                        (int)podiumLocations.get(i).getY() + 1,
-                        (int)podiumLocations.get(i).getZ()).setType(Material.BARRIER);
-                w.getBlockAt((int)podiumLocations.get(i).getX() - 1,
-                        (int)podiumLocations.get(i).getY() + 1,
-                        (int)podiumLocations.get(i).getZ()).setType(Material.BARRIER);
-                w.getBlockAt((int)podiumLocations.get(i).getX(),
-                        (int)podiumLocations.get(i).getY() + 1,
-                        (int)podiumLocations.get(i).getZ() + 1).setType(Material.BARRIER);
-                w.getBlockAt((int)podiumLocations.get(i).getX(),
-                        (int)podiumLocations.get(i).getY() + 1,
-                        (int)podiumLocations.get(i).getZ() - 1).setType(Material.BARRIER);
-                w.getBlockAt((int)podiumLocations.get(i).getX(),
-                        (int)podiumLocations.get(i).getY() + 2,
-                        (int)podiumLocations.get(i).getZ()).setType(Material.BARRIER);
+                w.getBlockAt((int) podiumLocations.get(i).getX() + 1,
+                        (int) podiumLocations.get(i).getY() + 1,
+                        (int) podiumLocations.get(i).getZ()).setType(Material.BARRIER);
+                w.getBlockAt((int) podiumLocations.get(i).getX() - 1,
+                        (int) podiumLocations.get(i).getY() + 1,
+                        (int) podiumLocations.get(i).getZ()).setType(Material.BARRIER);
+                w.getBlockAt((int) podiumLocations.get(i).getX(),
+                        (int) podiumLocations.get(i).getY() + 1,
+                        (int) podiumLocations.get(i).getZ() + 1).setType(Material.BARRIER);
+                w.getBlockAt((int) podiumLocations.get(i).getX(),
+                        (int) podiumLocations.get(i).getY() + 1,
+                        (int) podiumLocations.get(i).getZ() - 1).setType(Material.BARRIER);
+                w.getBlockAt((int) podiumLocations.get(i).getX(),
+                        (int) podiumLocations.get(i).getY() + 2,
+                        (int) podiumLocations.get(i).getZ()).setType(Material.BARRIER);
+            }
         }
     }
     public static void releasePlayersFromSpawn(World w, int t) {
-        if (t == -1) {
+        if (t == -1 || (GameStats.deathmatchCountDown == -1 && GameStats.chestTime == -1)) {
             for (int i = 0; i < players.size(); i++) {
                 w.getBlockAt((int)podiumLocations.get(i).getX() + 1,
                         (int)podiumLocations.get(i).getY() + 1,
