@@ -3,6 +3,7 @@ package hungrygamespackage;
 import com.sun.org.apache.bcel.internal.generic.LOR;
 import net.minecraft.server.v1_8_R3.EntityFireball;
 import net.minecraft.server.v1_8_R3.LoginListener;
+import net.minecraft.server.v1_8_R3.Vector3f;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -23,6 +24,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.*;
+import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -37,11 +39,10 @@ public class Main extends JavaPlugin implements Listener {
     private static Random r = new Random();
     public static boolean alerted = false;
 
-    World world = Bukkit.getWorld("world");
-
-
+    World world;
     @Override
     public void onEnable() {
+        world = Bukkit.getServer().createWorld(new WorldCreator("Aztec Islands"));
         world.setTime(0);
         getServer().getPluginManager().registerEvents(this, this);
         this.getCommand("dm").setExecutor(new DMCommand());
@@ -51,12 +52,12 @@ public class Main extends JavaPlugin implements Listener {
                 if (ticksSinceStarted >= -300) {
 
                     if (ticksSinceStarted == -295) {
-                        for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                             GameStats.createScoreBoard(player);
                         }
                     }
                     if (ticksSinceStarted == -300) {
-                        for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                             player.playSound(player.getLocation(), Sound.LEVEL_UP, 3, 1);
                         }
                     }
@@ -79,14 +80,16 @@ public class Main extends JavaPlugin implements Listener {
                     SupplyDrop.updateSupplyDrop(world, ticksSinceStarted);
                     Border.shrinkBorder(world, ticksSinceStarted);
                     Border.playBorderSound(world, ticksSinceStarted);
+                    Border.shootFire(world, ticksSinceStarted);
                     adjustDayLightCycle(world, ticksSinceStarted);
 
                     GameStats.updateDeathMatchCountDown(world, ticksSinceStarted);
                     GameStats.updateGameEnd(ticksSinceStarted);
                 }
 
-                if (alerted == false && PlayerManager.players.size() <= 4 && GameStats.deathmatchTime == 521) {
-                    for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                if (alerted == false && PlayerManager.players.size() <= 4 && GameStats.deathmatchTime == 257) {
+                    for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                        world.playSound(player.getLocation(), Sound.NOTE_PLING, 5, 1);
                         player.sendMessage("§a§lType §r§l/dm §a§lto initiate deathmatch");
                     }
                     alerted = true;
@@ -106,7 +109,7 @@ public class Main extends JavaPlugin implements Listener {
         //System.out.println(w.getTime());
         if (t <= 3900 && t > 1) {
             if (t % 39 == 0) {
-                w.setTime((int)(13500 * percent));
+                w.setTime((int) (13500 * percent));
                 percent += 0.01;
             } else if (t % 2 == 0) {
                 w.setTime(w.getTime() + 4);
@@ -119,7 +122,7 @@ public class Main extends JavaPlugin implements Listener {
         }
         if (t > 3900) {
             if (t % 12 == 0) {
-                w.setTime((int)(13500 + ((24050 - 13500) * percent)));
+                w.setTime((int) (13500 + ((24050 - 13500) * percent)));
                 percent += 0.01;
             } else if (t % 2 == 0) {
                 w.setTime(w.getTime() + 17);
@@ -145,16 +148,13 @@ public class Main extends JavaPlugin implements Listener {
 
         for (int i = 0; i < 3; i++) {
             Firework f = (Firework) world.spawnEntity(new Location(world, e.getEntity().getLocation().getX() + r.nextDouble() - 0.5,
-                    e.getEntity().getLocation().getY(),
-                    e.getEntity().getLocation().getZ() + r.nextDouble() - 0.5),
+                            e.getEntity().getLocation().getY(),
+                            e.getEntity().getLocation().getZ() + r.nextDouble() - 0.5),
                     EntityType.FIREWORK);
             FireworkMeta fwm = f.getFireworkMeta();
             fwm.addEffect(FireworkEffect.builder().withColor(Color.RED).trail(false).with(FireworkEffect.Type.BALL_LARGE).build());
             fwm.setPower(3 + (i / 5));
             f.setFireworkMeta(fwm);
         }
-
-
     }
-
 }

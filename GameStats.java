@@ -243,7 +243,7 @@ public class GameStats implements Listener {
                 objective.getScoreboard().resetScores(scores[5].getEntry());
                 scores[8] = objective.getScore("§c§lGame End");
                 scores[8].setScore(8);
-                objective.getScoreboard().resetScores(gameEndTime + " Seconds ");
+                objective.getScoreboard().resetScores((int)(gameEndTime + 1) + " Seconds ");
                 scores[6] = objective.getScore("Game Ending");
                 scores[6].setScore(7);
             }
