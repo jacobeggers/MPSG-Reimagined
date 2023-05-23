@@ -12,6 +12,7 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -34,6 +35,7 @@ public class Main extends JavaPlugin implements Listener {
     private double percent = 0.001;
     public static int day = 0;
     private static Random r = new Random();
+    public static boolean alerted = false;
 
     World world = Bukkit.getWorld("world");
 
@@ -48,7 +50,7 @@ public class Main extends JavaPlugin implements Listener {
             public void run() {
                 if (ticksSinceStarted >= -300) {
 
-                    if (ticksSinceStarted <= 0) {
+                    if (ticksSinceStarted == -295) {
                         for (Player player: Bukkit.getServer().getOnlinePlayers()) {
                             GameStats.createScoreBoard(player);
                         }
@@ -81,6 +83,13 @@ public class Main extends JavaPlugin implements Listener {
 
                     GameStats.updateDeathMatchCountDown(world, ticksSinceStarted);
                     GameStats.updateGameEnd(ticksSinceStarted);
+                }
+
+                if (alerted == false && PlayerManager.players.size() <= 4 && GameStats.deathmatchTime == 521) {
+                    for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                        player.sendMessage("§a§lType §r§l/dm §a§lto initiate deathmatch");
+                    }
+                    alerted = true;
                 }
 
                 if (ticksSinceStarted >= 5100) {
@@ -131,7 +140,7 @@ public class Main extends JavaPlugin implements Listener {
     }
 
     @EventHandler
-    public void onDeath(PlayerDeathEvent e) {
+    public void onDeath(EntityDeathEvent e) {
         e.getEntity().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 10));
 
         for (int i = 0; i < 3; i++) {

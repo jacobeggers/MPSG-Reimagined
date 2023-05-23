@@ -36,7 +36,7 @@ public class PlayerManager {
         }
     }
     public static void forcePlayersAtSpawn(World w, int t) {
-        if (t == -293 || GameStats.deathmatchCountDown == 10) {
+        if (t == -293 || GameStats.deathmatchCountDown == 9) {
             for (int i = 0; i < players.size(); i++) {
                 players.get(i).teleport(new Location(w, podiumLocations.get(i).getX() + 0.5,
                         podiumLocations.get(i).getY(),
