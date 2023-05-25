@@ -18,17 +18,16 @@ import static java.lang.Math.round;
 public class GameStats implements Listener {
     private static Objective objective;
     private static Random r = new Random();
-    private static double time = 0;
-    private static int playersAlive = Bukkit.getServer().getOnlinePlayers().size();
+    public static double time = 0;
+    public static int playersAlive = Bukkit.getServer().getOnlinePlayers().size();
     public static double chestTime = 419;
     public static double deathmatchTime = 599;
     public static double deathmatchCountDown = -1;
     public static double gameEndTime = -1;
-    private static Score[] scores = new Score[16];
-    private static String[] values = {"§a§lTime", (int)time + " Seconds", "§e§lTributes", "" + playersAlive, "§6§lChest Refill", (double) round(((chestTime - 1) / 60) * 10) / 10 + " Minutes "};
-    private static int[] pos = {14, 13, 11, 10, 8, 7};
-    private static int countDown = 15;
-
+    public static int countDown = 15;
+    public static Score[] scores = new Score[16];
+    public static String[] values = {"§a§lTime", (int)time + " Seconds", "§e§lTributes", "" + playersAlive, "§6§lChest Refill", (double) round(((chestTime - 1) / 60) * 10) / 10 + " Minutes "};
+    public static int[] pos = {14, 13, 11, 10, 8, 7};
     public static void gameCountdown(int t) {
         if (t % 20 == 0 && countDown > 0) {
             countDown--;
@@ -72,6 +71,11 @@ public class GameStats implements Listener {
                 scores[i].setScore(i);
             }
         }
+    }
+
+    public static void updateTributesLeft() {
+        objective.getScoreboard().resetScores(scores[3].getEntry());
+        scores[3] = objective.getScore("" + PlayerManager.players.size());
     }
 
     public static void updateGameTime(World w, int t) {

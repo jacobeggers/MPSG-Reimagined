@@ -16,7 +16,7 @@ import java.util.Random;
 
 public class Chests {
     private static Random r = new Random();
-    private static ArrayList<Location> chests = new ArrayList<Location>();
+    public static ArrayList<Location> chests = new ArrayList<Location>();
 
     private static Material[] loot = {Material.STONE_SWORD, Material.STONE_AXE, Material.WOOD_SWORD, Material.WOOD_AXE,
         Material.COOKED_BEEF, Material.COOKED_CHICKEN, Material.PORK, Material.COOKED_MUTTON, Material.APPLE, Material.FISHING_ROD, Material.BREAD,
@@ -36,6 +36,10 @@ public class Chests {
 
     public static void removeChests(World w, Location sl, Location el, int t) {
         if (t == -299 && Main.day == 0) {
+            for (int i = chests.size() - 1; i >= 0; i--) {
+                chests.remove(i);
+            }
+            System.out.println(chests.size());
             for (double x = sl.getX(); x <= el.getX(); x++) {
                 for (double y = sl.getY(); y <= el.getY(); y++) {
                     for (double z = sl.getZ(); z <= el.getZ(); z++) {

@@ -26,6 +26,7 @@ public class PlayerManager {
                     }
                 }
             }
+
             for (Player player: Bukkit.getServer().getOnlinePlayers()) {
                 players.add(player);
                 int selector = r.nextInt(potentialLocations.size());
@@ -79,5 +80,13 @@ public class PlayerManager {
                         (int)podiumLocations.get(i).getZ()).setType(Material.AIR);
             }
         }
+    }
+    public static boolean checkIfPlayerIsAlive(Player player) {
+        for (Player p: players) {
+            if (p.getName().equals(player.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
