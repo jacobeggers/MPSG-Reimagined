@@ -13,11 +13,10 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerChatEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.material.Chest;
@@ -55,6 +54,7 @@ public class Main extends JavaPlugin implements Listener {
                     if (ticksSinceStarted == -295) {
                         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                             GameStats.createScoreBoard(player);
+                            GameStats.removeScoreBoard(player);
                         }
                     }
                     if (ticksSinceStarted == -300) {
@@ -94,6 +94,14 @@ public class Main extends JavaPlugin implements Listener {
                         }
                     }
 
+                    if (ticksSinceStarted == -1) {
+                        for (Player player: PlayerManager.players) {
+                            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 675, 1));
+                            player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 675, 1));
+                            world.setPVP(true);
+                        }
+                    }
+
                     if (alerted == false && PlayerManager.players.size() <= 4 && GameStats.deathmatchTime == 257) {
                         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
                             world.playSound(player.getLocation(), Sound.NOTE_PLING, 5, 1);
@@ -108,8 +116,19 @@ public class Main extends JavaPlugin implements Listener {
                     }
                 }
 
-                if ((PlayerManager.players.size() == 0 && ticksSinceStarted > 0) || ticksSinceStarted == -499) {
-                    System.out.println("weagawegaweg");
+                if (ticksSinceStarted == -500) {
+                    for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                        if (player.getLocation().getY() > 33) {
+                            player.teleport(new Location(world, 4, 30, -25));
+                        }
+                    }
+                }
+
+                if ((PlayerManager.players.size() == 1 && ticksSinceStarted > 0) || ticksSinceStarted == -499) {
+                    for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                        if (ticksUntilReset == 199)
+                            player.sendTitle("§e" + PlayerManager.players.get(0).getName(), "§eHas won the game!");
+                    }
                     endGame();
                 }
             }
@@ -123,6 +142,8 @@ public class Main extends JavaPlugin implements Listener {
         world.setSpawnLocation(4, 101, -25);
         for (Player player: Bukkit.getServer().getOnlinePlayers()) {
             player.setGameMode(GameMode.ADVENTURE);
+            player.setHealth(20);
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 1,255));
         }
     }
 
@@ -138,8 +159,20 @@ public class Main extends JavaPlugin implements Listener {
             GameStats.deathmatchCountDown = -1;
             GameStats.gameEndTime = -1;
             day = 0;
+            world.setPVP(false);
+            world.setSpawnLocation(4, 101, -25);
+            for (Player player: Bukkit.getServer().getOnlinePlayers()) {
+                player.teleport(new Location(world, 4, 30, -25));
+                player.setGameMode(GameMode.ADVENTURE);
+                player.getInventory().clear();
+                player.getInventory().setBoots(null);
+                player.getInventory().setLeggings(null);
+                player.getInventory().setChestplate(null);
+                player.getInventory().setHelmet(null);
+
+            }
             if (PlayerManager.players.size() > 0) {
-                for (int i = PlayerManager.players.size() - 1; i >= 0; i++) {
+                for (int i = PlayerManager.players.size() - 1; i >= 0; i--) {
                     PlayerManager.players.remove(i);
                 }
             }
@@ -195,15 +228,15 @@ public class Main extends JavaPlugin implements Listener {
     }
 
     @EventHandler
-    public void onDeath(EntityDeathEvent e) {
+    public void onDeath(PlayerDeathEvent e) {
         e.getEntity().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 10));
         for (int i = 0; i < PlayerManager.players.size(); i++) {
-            if (PlayerManager.players.get(i).getName().equals(PlayerManager.players.get(i).getName())) {
+            if (e.getEntity().getName().equals(PlayerManager.players.get(i).getName())) {
                 PlayerManager.players.remove(i);
-                GameStats.updateTributesLeft();
             }
         }
         for (int i = 0; i < 3; i++) {
+            System.out.println("boom");
             Firework f = (Firework) world.spawnEntity(new Location(world, e.getEntity().getLocation().getX() + r.nextDouble() - 0.5,
                             e.getEntity().getLocation().getY(),
                             e.getEntity().getLocation().getZ() + r.nextDouble() - 0.5),
@@ -213,5 +246,11 @@ public class Main extends JavaPlugin implements Listener {
             fwm.setPower(3 + (i / 5));
             f.setFireworkMeta(fwm);
         }
+    }
+
+    @EventHandler
+    public void onHit(EntityDamageByEntityEvent e) {
+        Player player = (Player) e.getDamager();
+        player.removePotionEffect(PotionEffectType.SPEED);
     }
 }

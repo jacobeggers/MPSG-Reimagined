@@ -55,6 +55,10 @@ public class GameStats implements Listener {
         player.setScoreboard(board);
     }
 
+    public static void removeScoreBoard(Player player) {
+        player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+    }
+
     public static void initiateScoreboard() {
         int count = 0;
         for (int i = 15; i >= 7; i--) {
@@ -76,6 +80,7 @@ public class GameStats implements Listener {
     public static void updateTributesLeft() {
         objective.getScoreboard().resetScores(scores[3].getEntry());
         scores[3] = objective.getScore("" + PlayerManager.players.size());
+        scores[3].setScore(10);
     }
 
     public static void updateGameTime(World w, int t) {
